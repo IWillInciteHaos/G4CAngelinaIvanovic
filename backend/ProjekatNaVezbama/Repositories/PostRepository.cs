@@ -14,7 +14,7 @@ namespace ProjekatNaVezbama.Repositories
         {
             bool retVal = false;
             //Check if the username exists
-            if (!_repository.Users.Where(user => user.UsernameID.Equals(user.UsernameID)).Any())
+            if (!_repository.Users.Where(user => user.Username.Equals(user.Username)).Any())
             {
                 _repository.Posts.Add(new Post(user, content));
                  retVal = true;

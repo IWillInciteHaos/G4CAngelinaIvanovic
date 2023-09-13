@@ -8,10 +8,10 @@
         public int LikeCount { get; set; }
         public int CreatorID { get; set; }
         public User Creator { get; set; }
-        List<Comment> Comments { get; set; }
-        List<User> LikedBy { get; set; }
+        public List<Comment> Comments { get; set; }
+        public List<User> LikedBy { get; set; }
 
-        public Post() {}
+        public Post() { }
         public Post(User user, string content)
         {
             Content = content;
@@ -21,16 +21,6 @@
             Comments = new List<Comment>();
         }
 
-        public void GetCommentedOn(Comment c) {
-           // Comments.Add(c);
-            Console.WriteLine("Comment made");
-        }
 
-        public void GetLiked(User u) {
-            //one person can like one comment once
-            //LikedBy.Add(u);
-            LikeCount++;
-            Console.WriteLine("Post Liked");
-        }
     }
 }

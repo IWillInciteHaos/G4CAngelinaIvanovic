@@ -22,6 +22,21 @@ namespace ProjekatNaVezbama.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("PostUser", b =>
+                {
+                    b.Property<int>("LikedByID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LikedPostsID")
+                        .HasColumnType("int");
+
+                    b.HasKey("LikedByID", "LikedPostsID");
+
+                    b.HasIndex("LikedPostsID");
+
+                    b.ToTable("PostUser");
+                });
+
             modelBuilder.Entity("ProjekatNaVezbama.Model.Comment", b =>
                 {
                     b.Property<int>("ID")
@@ -43,14 +58,11 @@ namespace ProjekatNaVezbama.Migrations
                     b.Property<int>("OriginaPostID")
                         .HasColumnType("int");
 
-                    b.Property<int>("OriginalPostID")
-                        .HasColumnType("int");
-
                     b.HasKey("ID");
 
                     b.HasIndex("CreatorID");
 
-                    b.HasIndex("OriginalPostID");
+                    b.HasIndex("OriginaPostID");
 
                     b.ToTable("Comments");
                 });
@@ -62,6 +74,10 @@ namespace ProjekatNaVezbama.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("CreatorID")
                         .HasColumnType("int");
@@ -95,13 +111,34 @@ namespace ProjekatNaVezbama.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UsernameID")
+                    b.Property<int?>("UserID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.HasKey("ID");
 
+                    b.HasIndex("UserID");
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("PostUser", b =>
+                {
+                    b.HasOne("ProjekatNaVezbama.Model.User", null)
+                        .WithMany()
+                        .HasForeignKey("LikedByID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ProjekatNaVezbama.Model.Post", null)
+                        .WithMany()
+                        .HasForeignKey("LikedPostsID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ProjekatNaVezbama.Model.Comment", b =>
@@ -113,8 +150,8 @@ namespace ProjekatNaVezbama.Migrations
                         .IsRequired();
 
                     b.HasOne("ProjekatNaVezbama.Model.Post", "OriginalPost")
-                        .WithMany()
-                        .HasForeignKey("OriginalPostID")
+                        .WithMany("Comments")
+                        .HasForeignKey("OriginaPostID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -126,12 +163,31 @@ namespace ProjekatNaVezbama.Migrations
             modelBuilder.Entity("ProjekatNaVezbama.Model.Post", b =>
                 {
                     b.HasOne("ProjekatNaVezbama.Model.User", "Creator")
-                        .WithMany()
+                        .WithMany("Posts")
                         .HasForeignKey("CreatorID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("ProjekatNaVezbama.Model.User", b =>
+                {
+                    b.HasOne("ProjekatNaVezbama.Model.User", null)
+                        .WithMany("Followers")
+                        .HasForeignKey("UserID");
+                });
+
+            modelBuilder.Entity("ProjekatNaVezbama.Model.Post", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("ProjekatNaVezbama.Model.User", b =>
+                {
+                    b.Navigation("Followers");
+
+                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

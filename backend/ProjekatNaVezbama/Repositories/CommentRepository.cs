@@ -10,12 +10,12 @@ namespace ProjekatNaVezbama.Repositories
         {
             _repository = repository;
         }
-        public bool CreateComment(string message, string creatorID, int postID)
+        public bool CreateComment(string message, int creatorID, int postID)
         {
             bool retVal = false;
             //Check if the creator and post exist
             if (
-                !_repository.Users.Where(user => user.UsernameID.Equals(creatorID)).Any()
+                !_repository.Users.Where(user => user.Username.Equals(creatorID)).Any()
                 && !_repository.Posts.Where(p=> p.ID.Equals(postID)).Any()
                 )
             {
