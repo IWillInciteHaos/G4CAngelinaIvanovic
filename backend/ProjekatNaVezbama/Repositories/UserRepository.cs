@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Humanizer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProjekatNaVezbama.DB;
 using ProjekatNaVezbama.DTO;
 using ProjekatNaVezbama.Model;
@@ -13,31 +15,37 @@ namespace ProjekatNaVezbama.Repositories
             _repository = repository;
         }
 
-        public UserOutDTO CreateUser(UserCreateDTO dtoIN)
+        //user exists check??
+        
+        private bool UserExists(string username)
         {
-            throw new NotImplementedException();
+            return _repository.Users.Where(user => user.Username.Equals(username)).Any();
+
+        }
+        
+        public async Task<User> CreateUser(User user)
+        {
+            await _repository.AddAsync(user);
+            await _repository.SaveChangesAsync();
+
+            return user;
         }
 
-        public bool DeleteUser(string userID)
+        public async Task DeleteUser(User u)
         {
-            throw new NotImplementedException();
+            _repository.Users.Remove(u);
+            await _repository.SaveChangesAsync();
         }
 
-        public List<User> GetAllUsers()
+        public async Task<IEnumerable<User>> GetAllUsers()
         {
             // get all users or say nah
-            List<User> retVal = new List<User>();
-            if (_repository.Users.Any())
-            {
-                retVal = _repository.Users.ToList();
-            }
-
-            return retVal;
+            return await _repository.Users.AsNoTracking().ToListAsync();
         }
 
-        public User GetUser(string userID)
+        public async Task<User> GetUser(int uID)
         {
-            throw new NotImplementedException();
+            return await _repository.Users.AsNoTracking().FirstOrDefaultAsync(user => user.ID == uID);
         }
 
         public bool UpdateUser(string userID, string password = "", string email = "", User addFollower = null, User followAnother = null, Post newPost = null, Post likedPost = null, Comment likedComment = null)
