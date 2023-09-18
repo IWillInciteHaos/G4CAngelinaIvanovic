@@ -1,4 +1,6 @@
-﻿using ProjekatNaVezbama.DB;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using ProjekatNaVezbama.DB;
 using ProjekatNaVezbama.Model;
 
 namespace ProjekatNaVezbama.Repositories
@@ -10,58 +12,50 @@ namespace ProjekatNaVezbama.Repositories
         {
             _repository = repository;
         }
-        public bool CreatePost(User user, string content)
-        {
-            bool retVal = false;
-            //Check if the username exists
-            if (!_repository.Users.Where(user => user.Username.Equals(user.Username)).Any())
-            {
-                _repository.Posts.Add(new Post(user, content));
-                 retVal = true;
-                
-            }
 
-            return retVal;
+        public async Task<bool> CheckIfUserExists(string username)
+        {
+            return _repository.Users.Where(u => u.Username.CompareTo(username) == 0).Any();
+        }
+        public async Task<Post> CreatePost(Post post)
+        {
+            //Post retVal = null;
+            //Check if the username exists
+            //var temp = _repository.Users.Where(u => u.Username.CompareTo(post.Creator.Username) == 0).FirstOrDefault();
+            //if (_repository.Users.Where(u => u.Username.CompareTo(post.Creator.Username) == 0).Any())
+            //{
+            var tempUser = _repository.Users.Where(u => u.Username.CompareTo(post.Creator.Username) == 0).FirstOrDefault();
+            post.Creator = tempUser;
+            post.CreatorID = tempUser.ID;
+
+            await _repository.Posts.AddAsync(post);
+            await _repository.SaveChangesAsync();
+                
+            //}
+
+            return post;
         }
 
-        public bool DeletePost(Post ID)
+        public async Task DeletePost(Post post)
         {
-            bool retVal = false;
-            //Check if the post exists
-            if (_repository.Posts.Where(p => p.ID == ID.ID).Any())
-            {
-                _repository.Posts.Remove(ID);
-                retVal = true;
-
-            }
-            else
-            {
-                Console.WriteLine("#DeletePost# Post already deleted or you did something sus ");
-            }
-
-            return retVal;
+            _repository.Posts.Remove(post);
+            await _repository.SaveChangesAsync();
         }
 
         //get all in what context?
-        public List<Post> GetAllPosts()
+        public async Task<IEnumerable<Post>> GetAllPosts()
         {
-            List<Post> retVal = new List<Post>();
-
-            //is there an error if there are no posts?
-            retVal = _repository.Posts.Select(p => p).ToList();
+            IEnumerable<Post> retVal = null;
+            //                                      add creator
+            retVal = await _repository.Posts.Include(e=> e.Creator).Select(p => p).ToListAsync();
 
             return retVal;
         }
 
         //should I add getAllUserAllowed?
-        public Post GetPost(int id)
+        public async Task<Post> GetPost(int pID)
         {
-            Post retVal = null;
-
-            //is there an error if there are no posts?
-            retVal = _repository.Posts.Where(p => p.ID == id).FirstOrDefault();
-
-            return retVal;
+            return await _repository.Posts.AsNoTracking().FirstOrDefaultAsync(post => post.ID == pID);
         }
 
         public bool UpdatePost(string content, int ID)

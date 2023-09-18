@@ -55,14 +55,19 @@ namespace ProjekatNaVezbama.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OriginaPostID")
+                    b.Property<int>("OriginPostID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
 
                     b.HasIndex("CreatorID");
 
-                    b.HasIndex("OriginaPostID");
+                    b.HasIndex("OriginPostID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("Comments");
                 });
@@ -144,20 +149,24 @@ namespace ProjekatNaVezbama.Migrations
             modelBuilder.Entity("ProjekatNaVezbama.Model.Comment", b =>
                 {
                     b.HasOne("ProjekatNaVezbama.Model.User", "Creator")
-                        .WithMany()
+                        .WithMany("Comments")
                         .HasForeignKey("CreatorID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ProjekatNaVezbama.Model.Post", "OriginalPost")
+                    b.HasOne("ProjekatNaVezbama.Model.Post", "OriginPost")
                         .WithMany("Comments")
-                        .HasForeignKey("OriginaPostID")
+                        .HasForeignKey("OriginPostID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProjekatNaVezbama.Model.User", null)
+                        .WithMany("LikedComments")
+                        .HasForeignKey("UserID");
+
                     b.Navigation("Creator");
 
-                    b.Navigation("OriginalPost");
+                    b.Navigation("OriginPost");
                 });
 
             modelBuilder.Entity("ProjekatNaVezbama.Model.Post", b =>
@@ -185,7 +194,11 @@ namespace ProjekatNaVezbama.Migrations
 
             modelBuilder.Entity("ProjekatNaVezbama.Model.User", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Followers");
+
+                    b.Navigation("LikedComments");
 
                     b.Navigation("Posts");
                 });

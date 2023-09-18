@@ -48,9 +48,11 @@ namespace ProjekatNaVezbama.Repositories
             return await _repository.Users.AsNoTracking().FirstOrDefaultAsync(user => user.ID == uID);
         }
 
+        /*
         public bool UpdateUser(string userID, string password = "", string email = "", User addFollower = null, User followAnother = null, Post newPost = null, Post likedPost = null, Comment likedComment = null)
         {
             throw new NotImplementedException();
         }
+        */
     }
 }

@@ -8,14 +8,7 @@
         public int CreatorID { get; set; }
         public User Creator { get; set; }
         public int LikeCount { get; set; }
-        public int OriginaPostID { get; set; }
-        public Post OriginalPost { get; set; }
-        public Comment() { }
-        public Comment(string message, int creatorId, int postId)
-        {
-            Message = message;
-            CreatorID = creatorId;
-            OriginaPostID = postId;
-        }
+        public int OriginPostID { get; set; }
+        public Post OriginPost { get; set; }
     }
 }

@@ -4,6 +4,7 @@ namespace ProjekatNaVezbama.DTO
 {
     public class UserOutDTO
     {
+        public int ID { get; set; }
         public string Username { get; set; }
         //public DateTime CreatedDate { get; set; }
         public string Email { get; set; }

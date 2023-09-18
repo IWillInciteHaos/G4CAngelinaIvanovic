@@ -27,6 +27,7 @@ namespace ProjekatNaVezbama.DB
                 //or here
                 .HasForeignKey(post => post.CreatorID);*/
             mb.Entity<User>().HasMany(user => user.Followers);
+
             mb.Entity<User>().Property(u => u.Username).IsRequired();
             mb.Entity<User>().Property(u => u.Password).IsRequired();
             mb.Entity<User>().Property(u => u.Email).IsRequired();
@@ -49,11 +50,12 @@ namespace ProjekatNaVezbama.DB
                 c.HasKey(comment => comment.ID);
             });
             mb.Entity<Comment>()
-                .HasOne(comment => comment.OriginalPost)
+                .HasOne(comment => comment.OriginPost)
                 .WithMany(post => post.Comments)
-                .HasForeignKey(comment => comment.OriginaPostID);
+                .HasForeignKey(comment => comment.OriginPostID);
             mb.Entity<Comment>()
-                .HasOne(comment => comment.Creator);
+                .HasOne(comment => comment.Creator)
+                .WithMany(user => user.Comments);
             //check in here            
             mb.Entity<Comment>().Property(c => c.CreatorID).IsRequired();
             mb.Entity<Comment>().Property(c => c.Message).IsRequired();

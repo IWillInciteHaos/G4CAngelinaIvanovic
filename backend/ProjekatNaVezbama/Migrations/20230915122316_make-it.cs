@@ -63,14 +63,15 @@ namespace ProjekatNaVezbama.Migrations
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatorID = table.Column<int>(type: "int", nullable: false),
                     LikeCount = table.Column<int>(type: "int", nullable: false),
-                    OriginaPostID = table.Column<int>(type: "int", nullable: false)
+                    OriginPostID = table.Column<int>(type: "int", nullable: false),
+                    UserID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Comments", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Comments_Posts_OriginaPostID",
-                        column: x => x.OriginaPostID,
+                        name: "FK_Comments_Posts_OriginPostID",
+                        column: x => x.OriginPostID,
                         principalTable: "Posts",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
@@ -80,6 +81,11 @@ namespace ProjekatNaVezbama.Migrations
                         principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Comments_Users_UserID",
+                        column: x => x.UserID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -97,13 +103,13 @@ namespace ProjekatNaVezbama.Migrations
                         column: x => x.LikedPostsID,
                         principalTable: "Posts",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PostUser_Users_LikedByID",
                         column: x => x.LikedByID,
                         principalTable: "Users",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -112,9 +118,14 @@ namespace ProjekatNaVezbama.Migrations
                 column: "CreatorID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_OriginaPostID",
+                name: "IX_Comments_OriginPostID",
                 table: "Comments",
-                column: "OriginaPostID");
+                column: "OriginPostID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_UserID",
+                table: "Comments",
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_CreatorID",

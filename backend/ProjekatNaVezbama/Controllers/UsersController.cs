@@ -15,7 +15,7 @@ namespace ProjekatNaVezbama.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : Controller
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
 
@@ -47,11 +47,9 @@ namespace ProjekatNaVezbama.Controllers
         [HttpPost]
         public async Task<ActionResult<UserOutDTO>> Post(UserCreateDTO user)
         {
-            UserOutDTO retVal = await _userService.CreateUser(user);
-            //check user input here?
-           
+            UserOutDTO retVal = await _userService.CreateUser(user);           
 
-            return CreatedAtAction(nameof(Post), new { id = retVal.Username }, retVal);
+            return CreatedAtAction(nameof(Post), new { id = retVal.ID }, retVal);
         }
 
         //Delete

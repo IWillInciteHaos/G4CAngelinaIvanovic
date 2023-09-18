@@ -1,13 +1,15 @@
-﻿using ProjekatNaVezbama.Model;
+﻿using ProjekatNaVezbama.DTO;
+using ProjekatNaVezbama.Model;
 
 namespace ProjekatNaVezbama.Repositories
 {
     public interface IPostRepository
     {
-        bool CreatePost(User user, string content);
-        bool DeletePost(Post ID);
+        public Task<Post> CreatePost(Post post);
+        public Task DeletePost(Post ID);
         bool UpdatePost(string content, int ID);
-        Post GetPost(int id);
-        List<Post> GetAllPosts();
+        public Task<Post> GetPost(int id);
+        public Task<IEnumerable<Post>> GetAllPosts();
+        public Task<bool> CheckIfUserExists(string username);
     }
 }
