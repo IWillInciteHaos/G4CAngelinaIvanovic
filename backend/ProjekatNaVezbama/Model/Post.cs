@@ -3,6 +3,7 @@
     public class Post
     {
         public int ID { get; set; }
+        public bool isActive { get; set; }
         public DateTime DateCreated { get; set; }
         public string Content { get; set; }
         public int LikeCount { get; set; }

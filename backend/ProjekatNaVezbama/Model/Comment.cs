@@ -3,6 +3,7 @@
     public class Comment
     {
         public int ID { get; set; }
+        public bool isActive { get; set; }
         public string Message { get; set; }
         //user who made the message
         public int CreatorID { get; set; }

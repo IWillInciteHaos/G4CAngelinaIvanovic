@@ -34,7 +34,7 @@ namespace ProjekatNaVezbama.Controllers
                 return CreatedAtAction(nameof(CreatePost), new { id = retVal.ID }, retVal); 
             }
 
-            return NotFound();
+            return NotFound("User not found");
         }
 
         // GET: api/<UsersController>s
@@ -52,7 +52,7 @@ namespace ProjekatNaVezbama.Controllers
         {
             var retVal = await _postService.GetPost(id);
 
-            return retVal is null ? NotFound() : Ok(retVal);
+            return retVal is null ? NotFound() : (retVal.ID == -1 ? NotFound("Post deleted.") : retVal);
         }
 
         //Delete

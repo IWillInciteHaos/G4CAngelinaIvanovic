@@ -8,25 +8,48 @@ namespace ProjekatNaVezbama.Repositories
     public class PostRepository : IPostRepository
     {
         private readonly DBPostItContext _repository;
-        public PostRepository(DBPostItContext repository)
+        private readonly ICommentRepository _commentRepository;
+        public PostRepository(DBPostItContext repository, ICommentRepository commentRepository)
         {
             _repository = repository;
+            _commentRepository = commentRepository;
         }
+
+        /*
+         
+            bool retVal = false;
+            var temp = await _repository.Users.Where(u => u.Username.CompareTo(username) == 0).FirstOrDefaultAsync();
+            if(temp != null)
+            {
+                if(temp.isActive == true)
+                {
+                    retVal = true;
+                }
+            }
+
+            return retVal;
+         */
 
         public async Task<bool> CheckIfUserExists(string username)
         {
-            return _repository.Users.Where(u => u.Username.CompareTo(username) == 0).Any();
+            var retVal = false;
+            var tempUser = await _repository.Users.Where(u => u.Username.CompareTo(username) == 0).FirstOrDefaultAsync();
+
+            if(tempUser != null && tempUser.isActive)
+            {
+
+                retVal = true;
+            }
+
+            return retVal;
         }
+
         public async Task<Post> CreatePost(Post post)
         {
-            //Post retVal = null;
-            //Check if the username exists
-            //var temp = _repository.Users.Where(u => u.Username.CompareTo(post.Creator.Username) == 0).FirstOrDefault();
-            //if (_repository.Users.Where(u => u.Username.CompareTo(post.Creator.Username) == 0).Any())
-            //{
             var tempUser = _repository.Users.Where(u => u.Username.CompareTo(post.Creator.Username) == 0).FirstOrDefault();
             post.Creator = tempUser;
             post.CreatorID = tempUser.ID;
+            post.isActive = true;
 
             await _repository.Posts.AddAsync(post);
             await _repository.SaveChangesAsync();
@@ -36,18 +59,35 @@ namespace ProjekatNaVezbama.Repositories
             return post;
         }
 
+        public async Task DeleteMultiplePosts(List<Post> posts)
+        {
+            foreach (var post in posts)
+            {
+                DeletePost(post);
+            }
+        }
+
+        //don't actually delete it, just stop showing it
         public async Task DeletePost(Post post)
         {
-            _repository.Posts.Remove(post);
-            await _repository.SaveChangesAsync();
+            //var tempPost = _repository.Posts.Where(p => p.ID == post.ID).FirstOrDefault();
+            post.isActive = false;
+            //delete all the comments on the said post?
+            _repository.Update(post);
+
+            List<Comment> commentsChanged = _repository.Comments.Where(c => c.OriginPostID == post.ID).ToList();   
+            _commentRepository.DeleteMultipleComments(commentsChanged);
+
+            //await _repository.SaveChangesAsync();
+            
         }
 
         //get all in what context?
         public async Task<IEnumerable<Post>> GetAllPosts()
         {
+            //                                            add creator
             IEnumerable<Post> retVal = null;
-            //                                      add creator
-            retVal = await _repository.Posts.Include(e=> e.Creator).Select(p => p).ToListAsync();
+            retVal = await _repository.Posts.Include(e=> e.Creator).Where(p => p.isActive).ToListAsync();            
 
             return retVal;
         }
@@ -55,7 +95,9 @@ namespace ProjekatNaVezbama.Repositories
         //should I add getAllUserAllowed?
         public async Task<Post> GetPost(int pID)
         {
-            return await _repository.Posts.AsNoTracking().FirstOrDefaultAsync(post => post.ID == pID);
+            var retVal = await _repository.Posts.AsNoTracking().Where(p=> p.isActive).FirstOrDefaultAsync(post => post.ID == pID);
+            
+            return retVal;
         }
 
         public bool UpdatePost(string content, int ID)

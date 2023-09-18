@@ -29,6 +29,7 @@ namespace ProjekatNaVezbama.Services
                     return _mapper.Map<CommentOutDTO>(comment);
                 }
                 //forbid minus numbers to be used as the only part of the username?
+                retVal.CreatorUsername = "-2";
                 retVal.PostID = -1;
             }
             else

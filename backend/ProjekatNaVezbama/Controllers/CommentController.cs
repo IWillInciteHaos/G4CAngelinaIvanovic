@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using ProjekatNaVezbama.DTO;
 using ProjekatNaVezbama.Services;
 
@@ -22,10 +23,20 @@ namespace ProjekatNaVezbama.Controllers
             var retVal = await _commentService.CreateComment(commentDTO);
             if (retVal != null)
             {
+                if (retVal.CreatorUsername.IsNullOrEmpty() || retVal.CreatorUsername.Equals("-1"))
+                {
+                    return NotFound("No such user.");
+                }
+
+                if(retVal.PostID != null || retVal.PostID == -1)
+                {
+                    return NotFound("Post doesn't exist");
+                }
+
                 return CreatedAtAction(nameof(CreateComment), new { id = retVal.ID }, retVal);
             }
 
-            return NotFound();
+            return BadRequest();
         }
 
         // GET: api/<UsersController>s

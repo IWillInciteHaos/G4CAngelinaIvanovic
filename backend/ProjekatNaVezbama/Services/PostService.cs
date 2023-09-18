@@ -19,16 +19,16 @@ namespace ProjekatNaVezbama.Services
 
         public async Task<PostOutDTO> CreatePost(PostCreateDTO postDTO)
         {
-            //check for username
-            if(await _postRepository.CheckIfUserExists(postDTO.CreatorUsername))
+            //check for usern
+            var tempUser = await _postRepository.CheckIfUserExists(postDTO.CreatorUsername);
+            if (tempUser)
             {
-
                 var post = _mapper.Map<Post>(postDTO);
                 var retVal = await _postRepository.CreatePost(post);
 
                 return _mapper.Map<PostOutDTO>(retVal);
             }
-            //user doesn't exist
+            //user doesn't exist or is deactivated
             return null;
         }
 
@@ -39,6 +39,7 @@ namespace ProjekatNaVezbama.Services
             var retVal = false;
             if (tempPost != null)
             {
+
                 await _postRepository.DeletePost(tempPost);
                 retVal = true;
             }
@@ -56,11 +57,19 @@ namespace ProjekatNaVezbama.Services
         public async Task<PostOutDTO> GetPost(int postID)
         {
             //check if user is available??
+
             var tempPost = await _postRepository.GetPost(postID);
 
             if (tempPost == null)
             {
                 return null;
+            }
+
+            if(tempPost.isActive == false)
+            {
+                var retVal = new PostOutDTO();
+                retVal.ID = -1;
+                return retVal;
             }
 
             return _mapper.Map<PostOutDTO>(tempPost);

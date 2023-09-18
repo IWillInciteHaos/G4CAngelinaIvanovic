@@ -10,9 +10,11 @@ namespace ProjekatNaVezbama.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly DBPostItContext _repository;
-        public UserRepository(DBPostItContext repository)
+        private readonly IPostRepository _postRepository;
+        public UserRepository(DBPostItContext repository, IPostRepository postRepository)
         {
             _repository = repository;
+            _postRepository = postRepository;   
         }
 
         //user exists check??
@@ -33,19 +35,24 @@ namespace ProjekatNaVezbama.Repositories
 
         public async Task DeleteUser(User u)
         {
-            _repository.Users.Remove(u);
+            u.isActive = false;
+            _repository.Update(u);
+            
             await _repository.SaveChangesAsync();
+
+            var tempPosts = _repository.Posts.Where(p => p.CreatorID == u.ID).ToList();
+            _postRepository.DeleteMultiplePosts(tempPosts);
         }
 
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             // get all users or say nah
-            return await _repository.Users.AsNoTracking().ToListAsync();
+            return await _repository.Users.AsNoTracking().Where(u=>u.isActive).ToListAsync();
         }
 
         public async Task<User> GetUser(int uID)
         {
-            return await _repository.Users.AsNoTracking().FirstOrDefaultAsync(user => user.ID == uID);
+            return await _repository.Users.AsNoTracking().Where(user => user.ID == uID).FirstOrDefaultAsync(user => user.isActive);
         }
 
         /*

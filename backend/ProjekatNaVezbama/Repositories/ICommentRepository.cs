@@ -11,6 +11,7 @@ namespace ProjekatNaVezbama.Repositories
         public Task<IEnumerable<Comment>> GetAllComments();
         public Task<Comment> GetComment(int commentID);
         public Task DeleteComment(Comment comment);
+        public Task DeleteMultipleComments(List<Comment> comments);
         /*
         bool DeleteComment(Comment c);
         bool UpdateComment(string content, int ID);

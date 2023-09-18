@@ -3,6 +3,7 @@
     public class User
     {
         public int ID { get; set; }
+        public bool isActive { get; set; }
         //should be unique
         public string Username { get; set; }
         public string Password { get; set; }
@@ -21,6 +22,7 @@
             Username = username;
             Password = password;
             Email = email;
+            isActive = true;
             Followers = new List<User>();
             Posts = new List<Post>();
             LikedPosts = new List<Post>();

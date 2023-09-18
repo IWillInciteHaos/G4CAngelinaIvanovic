@@ -13,15 +13,34 @@ namespace ProjekatNaVezbama.Repositories
         {
             _repository = repository;
         }
-
+        //change to active posts?
         public async Task<bool> CheckIfPostExists(int postID)
         {
-            return await _repository.Posts.Where(p => p.ID == postID).AnyAsync();
+            var retVal = false;
+            var tempPost = await _repository.Posts.Where(p => p.ID == postID).FirstOrDefaultAsync();
+
+            if (tempPost != null && tempPost.isActive)
+            {
+
+                retVal = true;
+            }
+
+            return retVal;
         }
 
         public async Task<bool> CheckIfUserExists(string username)
         {
-            return await _repository.Users.Where(u => u.Username.CompareTo(username) == 0).AnyAsync();
+            var retVal = false;
+            var tempUser = await _repository.Users.Where(u => u.Username.CompareTo(username) == 0).FirstOrDefaultAsync();
+
+            if (tempUser != null && tempUser.isActive)
+            {
+
+                retVal = true;
+            }
+
+            return retVal;
+            
         }
 
         public async Task<Comment> CreateComment(Comment comment)
@@ -34,6 +53,8 @@ namespace ProjekatNaVezbama.Repositories
             comment.OriginPost = tempPost;
             comment.OriginPostID = tempPost.ID;
 
+            comment.isActive = true;
+
             await _repository.Comments.AddAsync(comment);
             await _repository.SaveChangesAsync();
 
@@ -43,22 +64,34 @@ namespace ProjekatNaVezbama.Repositories
 
         public async Task DeleteComment(Comment comment)
         {
-            _repository.Comments.Remove(comment);
+            comment.isActive = false;
+            _repository.Update(comment);
+            await _repository.SaveChangesAsync();
+        }
+
+        public async Task DeleteMultipleComments(List<Comment> comments)
+        {
+            foreach (var comment in comments)
+            {
+                comment.isActive = false;
+                _repository.Update(comment);
+            }
+
             await _repository.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Comment>> GetAllComments() 
-        { 
+        {
+            //                                             add creator
             IEnumerable<Comment> retVal = null;
-            //                                      add creator
-            retVal = await _repository.Comments.Include(c => c.Creator).Include(c => c.OriginPost).Select(p => p).ToListAsync();
-
+            retVal = await _repository.Comments.Include(c => c.Creator).Include(c => c.OriginPost).Where(c=> c.isActive).ToListAsync();
+            
             return retVal;
         }
 
         public async Task<Comment> GetComment(int commentID)
         {
-            return await _repository.Comments.AsNoTracking().FirstOrDefaultAsync(comment => comment.ID == commentID);
+            return await _repository.Comments.AsNoTracking().Where(c=>c.isActive).FirstOrDefaultAsync(comment => comment.ID == commentID);
         }
     }
 }

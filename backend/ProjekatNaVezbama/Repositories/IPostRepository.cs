@@ -7,6 +7,7 @@ namespace ProjekatNaVezbama.Repositories
     {
         public Task<Post> CreatePost(Post post);
         public Task DeletePost(Post ID);
+        public Task DeleteMultiplePosts(List<Post> posts);
         bool UpdatePost(string content, int ID);
         public Task<Post> GetPost(int id);
         public Task<IEnumerable<Post>> GetAllPosts();

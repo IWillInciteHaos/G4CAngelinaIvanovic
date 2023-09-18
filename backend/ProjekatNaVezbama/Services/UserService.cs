@@ -42,7 +42,15 @@ namespace ProjekatNaVezbama.Services
         //get all users from database
         public async Task<IEnumerable<UserOutDTO>> GetAllUsers()
         {
-            var retVal = await _userRepository.GetAllUsers();
+            var tempUserList = await _userRepository.GetAllUsers();
+            var retVal = tempUserList.ToList();
+            foreach (var user in retVal)
+            {
+                if (!user.isActive)
+                {
+                    retVal.Remove(user);
+                }
+            }
             return _mapper.Map<IEnumerable<UserOutDTO>>(retVal);
         }
 
@@ -50,7 +58,7 @@ namespace ProjekatNaVezbama.Services
         {
             var tempUser = await _userRepository.GetUser(userID);
 
-            if(tempUser != null)
+            if (tempUser == null || !tempUser.isActive)
             {
                 return null;
             }
