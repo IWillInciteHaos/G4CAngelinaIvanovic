@@ -1,0 +1,23 @@
+<div>
+    <nav class="nav-settings">
+        <span class="material-symbols-rounded home">
+            home
+        </span>
+        <span class="title-settings">
+            {{app_name}}
+        </span>
+        <span class="material-symbols-sharp account">
+            account_circle
+        </span>
+    </nav>
+
+    <mat-divider [inset]="true"></mat-divider>
+    
+    <div class="default-posts-settings">
+        <div *ngFor="let currentPost of posts; index as i" >
+            <app-post [post]="currentPost" [index]="i" (emitDelete)="removePost($event)"></app-post>
+            
+        </div>  
+    </div>       
+</div>
+

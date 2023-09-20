@@ -1,0 +1,27 @@
+<div class="fancy-border">
+    <div [align]="'right'" class="delete-class" (click)="deletePost()">
+        <span class="material-symbols-outlined" >
+            delete
+            </span>
+    </div>
+    <div>
+        {{post.Content}}          
+    </div>   
+    <br>
+    <div>
+        <div class='small-class'>
+            <div>
+               <div (click)="addLike()" class="like-class">
+                    <span [ngClass] = "{'material-symbols-sharp': !isLiked, 'material-symbols-rounded': isLiked}">
+                        favorite
+                    </span>
+                    {{post.LikeCount}}
+                </div>   
+            </div>
+            
+            <div>by: @{{post.CreatorUsername}}</div>
+        </div>
+        
+    </div>
+    <!--comments go here-->
+</div>
