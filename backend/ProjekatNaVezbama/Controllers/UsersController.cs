@@ -25,41 +25,68 @@ namespace ProjekatNaVezbama.Controllers
         }
 
         // GET: api/<UsersController>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserOutDTO>>> Get()
+        [HttpGet("get_users")]
+        public async Task<ActionResult<IEnumerable<UserOutDTO>>> GetAllUsers()
         {
             var retVal = await _userService.GetAllUsers();
             return Ok(retVal);
         }
 
-        
+
         // GET: api/<UsersController>
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserOutDTO>> Get(int id)
-        { 
+        [HttpGet("get_user/{id}")]
+        public async Task<ActionResult<UserOutDTO>> GetOneUser(int id)
+        {
             var retVal = await _userService.GetUser(id);
 
             return retVal is null ? NotFound() : Ok(retVal);
         }
 
+
         //make new user
         // POST api/<UsersController>
-        [HttpPost]
-        public async Task<ActionResult<UserOutDTO>> Post(UserCreateDTO user)
+        [HttpPost("create_user")]
+        public async Task<ActionResult<UserOutDTO>> CreateUser(UserCreateDTO user)
         {
             UserOutDTO retVal = await _userService.CreateUser(user);           
 
-            return CreatedAtAction(nameof(Post), new { id = retVal.ID }, retVal);
+            return CreatedAtAction(nameof(CreateUser), new { id = retVal.ID }, retVal);
         }
 
         //Delete
-        [HttpDelete]
-        public async Task<ActionResult> Delete(int id)
+        [HttpDelete("delete_user")]
+        public async Task<ActionResult> DeleteUser(int id)
         {
             var retVal = await _userService.DeleteUser(id);
 
             return retVal == false ? NotFound() : NoContent();
         }
+
+        [HttpPut("get_user")]
+        public async Task<ActionResult<UserOutDTO>> UpdateUser(UserUpdateCreateDTO userDTO)
+        {
+            var retVal = await _userService.UpdateUser(userDTO);
+
+            if(retVal != null)
+            {
+                var retValMessage = "";
+                retValMessage += retVal.Username.CompareTo("-1") == 0 ? "invalid username " : "";
+                retValMessage += retVal.Username.CompareTo("-2") == 0 ? "username taken " : "";
+                retValMessage += retVal.Password.CompareTo("-1") == 0 ? "invalid password " : "";
+                retValMessage += retVal.Email.CompareTo("-1") == 0 ? "invalid email" : "";
+
+                if (!retValMessage.IsNullOrEmpty())
+                {
+                    return BadRequest(retValMessage);
+                }
+
+                return Ok(retVal);
+
+            }
+            return BadRequest("no such user");
+        }
+
+        
 
     }
 }

@@ -83,6 +83,15 @@ namespace ProjekatNaVezbama.Repositories
         }
 
         //get all in what context?
+        public async Task<IEnumerable<Post>> GetUsersPosts(User user)
+        {
+            //                                            add creator
+            IEnumerable<Post> retVal = null;
+            retVal = await _repository.Posts.Where(p => p.isActive && p.CreatorID == user.ID).ToListAsync();            
+
+            return retVal;
+        }
+        
         public async Task<IEnumerable<Post>> GetAllPosts()
         {
             //                                            add creator

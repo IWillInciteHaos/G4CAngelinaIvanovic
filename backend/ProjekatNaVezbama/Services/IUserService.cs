@@ -10,5 +10,6 @@ namespace ProjekatNaVezbama.Services
         public Task<UserOutDTO> GetUser(int userID);
         public Task<UserOutDTO> CreateUser(UserCreateDTO userDTO);
         public Task<bool> DeleteUser(int id);
+        public Task<UserUpdateOutDTO> UpdateUser(UserUpdateCreateDTO userDTO);
     }
 }

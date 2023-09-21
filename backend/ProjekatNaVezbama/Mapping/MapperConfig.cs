@@ -10,6 +10,10 @@ namespace ProjekatNaVezbama.Mapping
         {
             CreateMap<User, UserCreateDTO>().ReverseMap();
             CreateMap<User, UserOutDTO>().ReverseMap();
+            CreateMap<User, UserUpdateCreateDTO>().ReverseMap();
+            CreateMap<User, UserUpdateOutDTO>().ReverseMap();
+            CreateMap<User, UserGetFollowersFollowedCreateDTO>().ReverseMap();  
+            CreateMap<User, UserGetFollowerFollowersOutDTO>().ReverseMap();  
 
             CreateMap<Post, PostCreateDTO>()
                 .ForMember(postDTO => postDTO.CreatorUsername, post => post.MapFrom(p => p.Creator.Username))
@@ -26,6 +30,7 @@ namespace ProjekatNaVezbama.Mapping
                 .ForMember(commentDTO => commentDTO.CreatorUsername, comment => comment.MapFrom(c => c.Creator.Username))
                 .ForMember(commentDTO => commentDTO.PostID, comment => comment.MapFrom(p => p.OriginPostID))
                 .ReverseMap();
+            
         }
 
     }

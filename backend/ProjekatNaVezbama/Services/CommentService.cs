@@ -9,12 +9,16 @@ namespace ProjekatNaVezbama.Services
     public class CommentService : ICommentService
     {
         private readonly ICommentRepository _commentRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IPostRepository _postRepository;
         private readonly IMapper _mapper;
 
-        public CommentService(ICommentRepository commentService, IMapper map)
+        public CommentService(ICommentRepository commentService, IMapper map, IUserRepository userRepository, IPostRepository postRepository)
         {
             _commentRepository = commentService;
             _mapper = map;
+            _userRepository = userRepository;
+            _postRepository = postRepository;   
         }
 
         public async Task<CommentOutDTO> CreateComment(CommentCreateDTO commentDTO)
@@ -78,8 +82,19 @@ namespace ProjekatNaVezbama.Services
 
             return _mapper.Map<CommentOutDTO>(tempComment);
         }
+
+        public async Task<List<CommentOutDTO>> GetPostComments(int postID)
+        {
+            var tempPost = await _postRepository.GetPost(postID);
+            if(tempPost == null)
+            {
+                return null;
+            }
+
+            var retVal = await _commentRepository.GetPostComments(tempPost);
+
+            return _mapper.Map<List<CommentOutDTO>>(retVal);
             
-
-
+        }
     }
 }

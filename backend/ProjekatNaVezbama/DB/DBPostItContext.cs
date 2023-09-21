@@ -13,20 +13,15 @@ namespace ProjekatNaVezbama.DB
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        //public DbSet<Follower> Followers { get; set; }
         protected override void OnModelCreating(ModelBuilder mb)
         {
             //User
             mb.Entity<User>(user =>
             {
                 user.HasKey(u => u.ID);
+
             });
-            //kreni odavde
-            /*mb.Entity<User>()
-                .HasMany(user => user.Posts)
-                .WithOne(post => post.Creator)
-                //or here
-                .HasForeignKey(post => post.CreatorID);*/
-            mb.Entity<User>().HasMany(user => user.Followers);
 
             mb.Entity<User>().Property(u => u.Username).IsRequired();
             mb.Entity<User>().Property(u => u.Password).IsRequired();
@@ -37,29 +32,48 @@ namespace ProjekatNaVezbama.DB
             mb.Entity<Post>(p =>
             {
                 p.HasKey(post => post.ID);
+
+                p.HasOne(pst => pst.Creator)
+                    .WithMany(u => u.Posts)
+                    .HasForeignKey(p => p.CreatorID)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_Creator_Post_ID");
             });
-            mb.Entity<Post>()
-                .HasOne(post => post.Creator)
-                .WithMany(creator => creator.Posts)
-                .HasForeignKey(post => post.CreatorID);
             mb.Entity<Post>().Property(p => p.CreatorID).IsRequired();
             mb.Entity<Post>().Property(p => p.Content).IsRequired();
             //Comment
             mb.Entity<Comment>(c =>
             {
                 c.HasKey(comment => comment.ID);
+
+                c.HasOne(cmt => cmt.Creator)
+                    .WithMany(u => u.Comments)
+                    .HasForeignKey(c => c.CreatorID)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_Creator_Comment_ID");
+                c.HasOne(cmt => cmt.OriginPost)
+                    .WithMany(p => p.Comments)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_Origin_Post");
             });
-            mb.Entity<Comment>()
-                .HasOne(comment => comment.OriginPost)
-                .WithMany(post => post.Comments)
-                .HasForeignKey(comment => comment.OriginPostID);
-            mb.Entity<Comment>()
-                .HasOne(comment => comment.Creator)
-                .WithMany(user => user.Comments);
             //check in here            
             mb.Entity<Comment>().Property(c => c.CreatorID).IsRequired();
+            mb.Entity<Comment>().Property(c => c.OriginPostID).IsRequired();
             mb.Entity<Comment>().Property(c => c.Message).IsRequired();
 
+            /*
+            mb.Entity<Follower>()
+                .HasKey(f => f.ID);
+
+            mb.Entity<Follower>()
+                .HasOne(f => f.User)
+                .WithMany(u=> u.Following)
+                .HasForeignKey(f=> f.ID)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            mb.Entity<Follower>()
+                .HasMany(f => f.ToFollow)
+                .WithMany(u=> u.Followers);*/
             base.OnModelCreating(mb);
         }
     }

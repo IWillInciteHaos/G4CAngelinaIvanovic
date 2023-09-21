@@ -11,6 +11,7 @@ namespace ProjekatNaVezbama.Repositories
         bool UpdatePost(string content, int ID);
         public Task<Post> GetPost(int id);
         public Task<IEnumerable<Post>> GetAllPosts();
+        public Task<IEnumerable<Post>> GetUsersPosts(User u);
         public Task<bool> CheckIfUserExists(string username);
     }
 }

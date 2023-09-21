@@ -12,8 +12,8 @@ using ProjekatNaVezbama.DB;
 namespace ProjekatNaVezbama.Migrations
 {
     [DbContext(typeof(DBPostItContext))]
-    [Migration("20230918121756_active-inactive-option")]
-    partial class activeinactiveoption
+    [Migration("20230921140324_relations-v1")]
+    partial class relationsv1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -125,9 +125,6 @@ namespace ProjekatNaVezbama.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(32)
@@ -137,8 +134,6 @@ namespace ProjekatNaVezbama.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("UserID");
 
                     b.ToTable("Users");
                 });
@@ -163,14 +158,16 @@ namespace ProjekatNaVezbama.Migrations
                     b.HasOne("ProjekatNaVezbama.Model.User", "Creator")
                         .WithMany("Comments")
                         .HasForeignKey("CreatorID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_Creator_Comment_ID");
 
                     b.HasOne("ProjekatNaVezbama.Model.Post", "OriginPost")
                         .WithMany("Comments")
                         .HasForeignKey("OriginPostID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_Origin_Post");
 
                     b.HasOne("ProjekatNaVezbama.Model.User", null)
                         .WithMany("LikedComments")
@@ -186,17 +183,11 @@ namespace ProjekatNaVezbama.Migrations
                     b.HasOne("ProjekatNaVezbama.Model.User", "Creator")
                         .WithMany("Posts")
                         .HasForeignKey("CreatorID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired()
+                        .HasConstraintName("FK_Creator_Post_ID");
 
                     b.Navigation("Creator");
-                });
-
-            modelBuilder.Entity("ProjekatNaVezbama.Model.User", b =>
-                {
-                    b.HasOne("ProjekatNaVezbama.Model.User", null)
-                        .WithMany("Followers")
-                        .HasForeignKey("UserID");
                 });
 
             modelBuilder.Entity("ProjekatNaVezbama.Model.Post", b =>
@@ -207,8 +198,6 @@ namespace ProjekatNaVezbama.Migrations
             modelBuilder.Entity("ProjekatNaVezbama.Model.User", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("Followers");
 
                     b.Navigation("LikedComments");
 

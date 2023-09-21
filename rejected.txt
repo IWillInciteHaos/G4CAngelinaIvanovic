@@ -1,0 +1,190 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
+using ProjekatNaVezbama.DTO;
+
+[HttpPut("adjust_follower")]
+public async Task<ActionResult<UserFollowOutDTO>> FollowAnother(UserFollowCreateDTO userDTO)
+{
+    var retVal = await _userService.UserFollow(userDTO);
+
+    if (retVal != null)
+    {
+        var retValMessage = "";
+        retValMessage += retVal.Follower.ID == -1 ? "invalid follower username " : "";
+        retValMessage += retVal.UserToFollow.ID == -1 ? "invalid username to follow" : "";
+
+        if (!retValMessage.IsNullOrEmpty())
+        {
+            return BadRequest(retValMessage);
+        }
+
+        return Ok(retVal.IsFollowing ? "Followed user " + retVal.UserToFollow.Username : "Unfollowed user " + retVal.UserToFollow.Username);
+
+    }
+    return BadRequest();
+}
+
+
+
+        [HttpGet("get_followers")]
+        public async Task<ActionResult<List<UserGetFollowerFollowersOutDTO>>> GetAllFollowersFollowing([FromQuery] UserGetFollowersFollowedCreateDTO userDTO)
+        { 
+            var retVal = await _userService.GetAllFollowersFollows(userDTO);
+
+            if(retVal == null)
+            {
+                return NotFound("User's following not found.");
+            }
+
+            return Ok(retVal);
+        }
+
+
+
+        public Task<UserFollowOutDTO> UserFollow(UserFollowCreateDTO userDTO);
+        public Task<List<UserGetFollowerFollowersOutDTO>> GetAllFollowersFollows(UserGetFollowersFollowedCreateDTO userDTO);
+
+public async Task<UserFollowOutDTO> UserFollow(UserFollowCreateDTO userDTO)
+        {
+            var follower = await _userRepository.GetUser(userDTO.FollowerID);
+            var toFollow = await _userRepository.GetUser(userDTO.UserToFollowID);
+
+            var retVal = new UserFollowOutDTO();
+            if(follower == null || !follower.isActive)
+            {
+                retVal.Follower.ID = -1;
+            }
+            if(toFollow == null || !toFollow.isActive)
+            {
+                retVal.UserToFollow.ID = -1;
+            }
+
+            if(retVal.Follower.ID == -1 || retVal.UserToFollow.ID == -1)
+            {
+                return retVal;
+            }
+
+
+            //var tempFollowersList = await _userRepository.GetAllFollowers(toFollow);
+
+            var tempFollower = await _userRepository.GetOneFollower(follower.ID);
+            if(tempFollower == null)
+            {
+                tempFollower = new Follower(follower);
+                tempFollower.FollowingID = userDTO.FollowerID;
+                tempFollower.User = await _userRepository.GetUser(tempFollower.FollowingID);
+                await _userRepository.FollowUser(tempFollower, toFollow);
+                retVal.IsFollowing = true;
+            }
+            else
+            {
+                tempFollower.User = await _userRepository.GetUser(tempFollower.FollowingID);
+                await _userRepository.UnfollowUser(tempFollower, toFollow);
+                retVal.IsFollowing = false;
+            }
+            
+
+            retVal.Follower = _mapper.Map<UserOutDTO>(follower);
+            retVal.UserToFollow = _mapper.Map<UserOutDTO>(toFollow);
+
+            return retVal;
+        }
+
+
+        public async Task<List<UserGetFollowerFollowersOutDTO>> GetAllFollowersFollows(UserGetFollowersFollowedCreateDTO userDTO)
+        {
+            List<User> following = null;
+            var tempUser = await _userRepository.GetUser(userDTO.ID);
+            //check if user exists at all
+            if(tempUser == null)
+            {
+                var tempRetVal = new List<UserGetFollowerFollowersOutDTO>() ;
+                tempRetVal.Add(new UserGetFollowerFollowersOutDTO(-1) );
+                return tempRetVal;
+
+            }
+
+            //followers or following?
+            if (userDTO.ForFollowers)
+            {
+                var tempFollowerList = await _userRepository.GetAllFollowers(tempUser);
+                if(tempFollowerList != null)
+                {
+                    foreach (var follower in tempFollowerList)
+                    {
+                        //make a repository function where you get all from a list?
+                        following.Add(await _userRepository.GetUser(follower.FollowingID));
+                    }
+                }else
+                {
+                    return new List<UserGetFollowerFollowersOutDTO>();
+                }
+            }
+            else 
+            {
+                following = await _userRepository.GetAllFollowing(tempUser);
+            }
+
+            List<UserGetFollowerFollowersOutDTO> retVal = new List<UserGetFollowerFollowersOutDTO>();
+            foreach (var user in following)
+            {
+                retVal.Add(_mapper.Map<UserGetFollowerFollowersOutDTO>(user));
+            }
+
+            return retVal;
+
+        }
+
+
+        public Task FollowUser(Follower following, User toFollow);
+        public Task UnfollowUser(Follower following, User toFollow);
+
+        public Task<List<Follower>> GetAllFollowers(User user);
+        public Task<List<User>> GetAllFollowing(User user);
+        public Task<Follower> GetOneFollower(int fID);
+
+
+
+
+
+        public async Task FollowUser(Follower following, User toFollow)
+        {
+            //var tempUser = await _repository.Users.Include(u=>u.Followers).Where(u => u.ID == toFollow.ID).FirstOrDefaultAsync();
+
+            toFollow.Followers.Add(following);
+            _repository.Update(toFollow);
+            _repository.SaveChanges();
+        }
+        public async Task UnfollowUser(Follower following, User toFollow)
+        {
+            toFollow.Followers.Remove(following);
+            _repository.Update(toFollow);
+
+            //var tempFollowers = await _repository.Followers.ToListAsync();
+            //tempFollowers.Remove(following);
+            //_repository.Update(tempFollowers);
+            _repository.SaveChanges();
+        }
+
+        public async Task<List<Follower>> GetAllFollowers(User user)
+        {
+            var tempFollower = await _repository.Users.Include(usr=> usr.Followers).Where(u=>u.ID == user.ID).FirstOrDefaultAsync();
+            return tempFollower.Followers;
+            
+                        
+        }
+
+        public async Task<List<User>> GetAllFollowing(User user)
+        {
+            var tempFollower = await _repository.Followers.Where(f=>f.FollowingID == user.ID).FirstOrDefaultAsync();
+
+            return tempFollower.ToFollow;
+        }
+        public async Task<Follower> GetOneFollower(int fID)
+        {
+            return await _repository.Followers.Where(f => f.FollowingID == fID).FirstOrDefaultAsync();
+        }
+    }
+
+
+

@@ -9,25 +9,15 @@
         public string Password { get; set; }
         //public DateTime CreatedDate { get; set; }
         public string Email { get; set; }
-        public List<User> Followers { get; set; }
-        public List<Post> Posts { get; set; }
-        public List<Post> LikedPosts { get; set; }
-        public List<Comment> Comments { get; set; }
-        public List<Comment> LikedComments { get; set; }
+        //public List<Follower> Followers { get; set; } = new List<Follower>();
+        //public List<Follower> Following { get; set; } = new List<Follower>();
+        public List<Post> Posts { get; set; } = new List<Post>();
+        public List<Post> LikedPosts { get; set; } = new List<Post>();
+        public List<Comment> Comments { get; set; } = new List<Comment>();
+        public List<Comment> LikedComments { get; set; } = new List<Comment>();
 
         public User() { }
 
-        public User(string username, string password, string email)
-        {
-            Username = username;
-            Password = password;
-            Email = email;
-            isActive = true;
-            Followers = new List<User>();
-            Posts = new List<Post>();
-            LikedPosts = new List<Post>();
-
-        }
 
     }
 }

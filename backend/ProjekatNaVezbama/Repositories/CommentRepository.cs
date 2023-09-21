@@ -93,5 +93,10 @@ namespace ProjekatNaVezbama.Repositories
         {
             return await _repository.Comments.AsNoTracking().Where(c=>c.isActive).FirstOrDefaultAsync(comment => comment.ID == commentID);
         }
+
+        public async Task<List<Comment>> GetPostComments(Post p)
+        {
+            return await _repository.Comments.Include(c=> c.OriginPost).Where(cmt=> cmt.OriginPost == p).ToListAsync();
+        }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ProjekatNaVezbama.Migrations
 {
     /// <inheritdoc />
-    public partial class makeit : Migration
+    public partial class relationsv1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,19 +17,14 @@ namespace ProjekatNaVezbama.Migrations
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    isActive = table.Column<bool>(type: "bit", nullable: false),
                     Username = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserID = table.Column<int>(type: "int", nullable: true)
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Users_Users_UserID",
-                        column: x => x.UserID,
-                        principalTable: "Users",
-                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -38,6 +33,7 @@ namespace ProjekatNaVezbama.Migrations
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    isActive = table.Column<bool>(type: "bit", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LikeCount = table.Column<int>(type: "int", nullable: false),
@@ -47,11 +43,10 @@ namespace ProjekatNaVezbama.Migrations
                 {
                     table.PrimaryKey("PK_Posts", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Posts_Users_CreatorID",
+                        name: "FK_Creator_Post_ID",
                         column: x => x.CreatorID,
                         principalTable: "Users",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
+                        principalColumn: "ID");
                 });
 
             migrationBuilder.CreateTable(
@@ -60,6 +55,7 @@ namespace ProjekatNaVezbama.Migrations
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    isActive = table.Column<bool>(type: "bit", nullable: false),
                     Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CreatorID = table.Column<int>(type: "int", nullable: false),
                     LikeCount = table.Column<int>(type: "int", nullable: false),
@@ -70,21 +66,19 @@ namespace ProjekatNaVezbama.Migrations
                 {
                     table.PrimaryKey("PK_Comments", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Comments_Posts_OriginPostID",
-                        column: x => x.OriginPostID,
-                        principalTable: "Posts",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Comments_Users_CreatorID",
-                        column: x => x.CreatorID,
-                        principalTable: "Users",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
                         name: "FK_Comments_Users_UserID",
                         column: x => x.UserID,
                         principalTable: "Users",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_Creator_Comment_ID",
+                        column: x => x.CreatorID,
+                        principalTable: "Users",
+                        principalColumn: "ID");
+                    table.ForeignKey(
+                        name: "FK_Origin_Post",
+                        column: x => x.OriginPostID,
+                        principalTable: "Posts",
                         principalColumn: "ID");
                 });
 
@@ -136,11 +130,6 @@ namespace ProjekatNaVezbama.Migrations
                 name: "IX_PostUser_LikedPostsID",
                 table: "PostUser",
                 column: "LikedPostsID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_UserID",
-                table: "Users",
-                column: "UserID");
         }
 
         /// <inheritdoc />

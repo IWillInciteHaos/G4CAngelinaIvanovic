@@ -8,6 +8,8 @@ namespace ProjekatNaVezbama.Services
         public Task<PostOutDTO> CreatePost(PostCreateDTO postDTO);
         public Task<IEnumerable<PostOutDTO>> GetAllPosts();
         public Task<PostOutDTO> GetPost(int postID);
+        public Task<List<PostOutDTO>> GetUsersPost(string username);
         public Task<bool> DeletePost(int id);
+
     }
 }

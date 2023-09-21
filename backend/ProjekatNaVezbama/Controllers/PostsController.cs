@@ -25,7 +25,7 @@ namespace ProjekatNaVezbama.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("create_post")]
         public async Task<ActionResult<PostOutDTO>> CreatePost(PostCreateDTO postDTO)
         {
             var retVal = await _postService.CreatePost(postDTO);
@@ -37,9 +37,8 @@ namespace ProjekatNaVezbama.Controllers
             return NotFound("User not found");
         }
 
-        // GET: api/<UsersController>s
-        [HttpGet]
-        //am I allowed to rename Get into GetAllPosts or something?
+        // GET: api/<PostsController>s
+        [HttpGet("get_all_posts")]
         public async Task<ActionResult<IEnumerable<PostOutDTO>>> GetAllPosts()
         {
             var retVal = await _postService.GetAllPosts();
@@ -47,16 +46,25 @@ namespace ProjekatNaVezbama.Controllers
         }
 
         // GET: api/<UsersController>
-        [HttpGet("{id}")]
-        public async Task<ActionResult<PostOutDTO>> GetOnePost(int id)
+        [HttpGet("get_post/id")]
+        public async Task<ActionResult<PostOutDTO>> GetOnePost([FromQuery] int id)
         {
             var retVal = await _postService.GetPost(id);
 
             return retVal is null ? NotFound() : (retVal.ID == -1 ? NotFound("Post deleted.") : retVal);
         }
 
+        [HttpGet("get_user_post")]
+        public async Task<ActionResult<List<PostOutDTO>>> GetOneUsersPost([FromQuery] string username)
+        {
+            var retVal = await _postService.GetUsersPost(username);
+
+            //work on this
+            return retVal is null ? NotFound() : /*(retVal.ID == -1 ? NotFound("Post deleted.") :*/ Ok(retVal);
+        }
+
         //Delete
-        [HttpDelete]
+        [HttpDelete("delete_post")]
         public async Task<ActionResult> DeletePost(int id)
         {
             var retVal = await _postService.DeletePost(id);

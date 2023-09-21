@@ -1,14 +1,16 @@
 .fancy-border{
-    border: solid #3262a8 3px;    
-    border-radius: 9% 91% 14% 86% / 85% 18% 82% 15%;
-    /* From https://css.glass */
-    background: #afc1ff;
-    backdrop-filter: blur(7.8px);
-    -webkit-backdrop-filter: blur(7.8px);
-    padding: 15px;
-    margin: 10px;
-    width: clamp(140px, 15vw, 500px);
-    font-size: medium;
+  border: solid #3262a8 3px;    
+  border-radius: 9% 91% 14% 86% / 85% 18% 82% 15%;
+  /* From https://css.glass *//* From https://css.glass */
+  background: rgba(175, 193, 255);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 15px;
+  margin: 10px;
+  width: clamp(140px, 15vw, 500px);
+  font-size: medium;
+  z-index: 1;
 }
 
 .small-class{

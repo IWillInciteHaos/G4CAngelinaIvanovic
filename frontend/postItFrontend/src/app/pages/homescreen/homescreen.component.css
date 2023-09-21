@@ -12,22 +12,22 @@
     height: min(50px, 20vh);
     border-bottom: solid #afc1ff 2px;
     text-align: center;
+    background-color: #d7e0ff;
 }
 
 .home{
     cursor: pointer;
-    float: inline-start;
+    float: left;
     margin: 10px;
 }
 
 .account{
     cursor: pointer;
-    float: inline-end;
+    float: right;
     margin: 10px;
 }
 
 .title-settings{
-    margin-top: 5px;
     font-size: clamp(20px, min(20vw, 20vh), min(45px, 18vh));
     font-family: 'Macondo', cursive;
     text-shadow: 1px 1px 2px #4059ad;;

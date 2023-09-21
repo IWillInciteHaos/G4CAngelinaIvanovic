@@ -14,17 +14,25 @@ namespace ProjekatNaVezbama.Repositories
         public UserRepository(DBPostItContext repository, IPostRepository postRepository)
         {
             _repository = repository;
-            _postRepository = postRepository;   
+            _postRepository = postRepository;
+        }
+        /*
+        public List<Follower> GetUserFollowers(User user)
+        {
+            _repository.Follower
+        }*/
+        public async Task<User> GetUserByUsername(string username)
+        {
+            return await _repository.Users.Where(u => u.Username.CompareTo(username) == 0).FirstOrDefaultAsync();
         }
 
         //user exists check??
-        
-        private bool UserExists(string username)
+        public async Task<bool> UsernameExists(string username)
         {
-            return _repository.Users.Where(user => user.Username.Equals(username)).Any();
+            return await _repository.Users.Where(user => user.Username.CompareTo(username) == 0).AnyAsync();
 
         }
-        
+
         public async Task<User> CreateUser(User user)
         {
             await _repository.AddAsync(user);
@@ -37,7 +45,7 @@ namespace ProjekatNaVezbama.Repositories
         {
             u.isActive = false;
             _repository.Update(u);
-            
+
             await _repository.SaveChangesAsync();
 
             var tempPosts = _repository.Posts.Where(p => p.CreatorID == u.ID).ToList();
@@ -47,19 +55,22 @@ namespace ProjekatNaVezbama.Repositories
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             // get all users or say nah
-            return await _repository.Users.AsNoTracking().Where(u=>u.isActive).ToListAsync();
+            return await _repository.Users.AsNoTracking().Where(u => u.isActive).ToListAsync();
         }
 
         public async Task<User> GetUser(int uID)
         {
-            return await _repository.Users.AsNoTracking().Where(user => user.ID == uID).FirstOrDefaultAsync(user => user.isActive);
+            return await _repository.Users.AsNoTracking()
+                .Where(user => user.ID == uID).FirstOrDefaultAsync(user => user.isActive);
         }
 
-        /*
-        public bool UpdateUser(string userID, string password = "", string email = "", User addFollower = null, User followAnother = null, Post newPost = null, Post likedPost = null, Comment likedComment = null)
+
+        public async Task<User> UpdateUser(User newUser)
         {
-            throw new NotImplementedException();
+            _repository.Update(newUser);
+            await _repository.SaveChangesAsync();
+
+            return newUser;
         }
-        */
     }
 }

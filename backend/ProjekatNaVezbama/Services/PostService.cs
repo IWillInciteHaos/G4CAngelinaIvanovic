@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Hosting;
 using ProjekatNaVezbama.DTO;
 using ProjekatNaVezbama.Model;
 using ProjekatNaVezbama.Repositories;
@@ -10,11 +11,13 @@ namespace ProjekatNaVezbama.Services
 
         private readonly IMapper _mapper;
         private readonly IPostRepository _postRepository;
+        private readonly IUserRepository _userRepository;
 
-        public PostService(IPostRepository pr, IMapper map)
+        public PostService(IPostRepository pr, IMapper map, IUserRepository uRep)
         {
             _postRepository = pr;
             _mapper = map;
+            _userRepository = uRep;
         }
 
         public async Task<PostOutDTO> CreatePost(PostCreateDTO postDTO)
@@ -53,7 +56,21 @@ namespace ProjekatNaVezbama.Services
            var retVal = await _postRepository.GetAllPosts();
            return _mapper.Map<IEnumerable<PostOutDTO>>(retVal);
         }
+        //get all users posts
+        public async Task<List<PostOutDTO>> GetUsersPost(string username)
+        {
+            var tempUser = await _userRepository.GetUserByUsername(username);
+            if(tempUser == null)
+            {
+                return null;
+            }
 
+            var tempList = await _postRepository.GetUsersPosts(tempUser);
+            var retVal = _mapper.Map<List<PostOutDTO>>(tempList);
+
+            return retVal;
+
+        }
         public async Task<PostOutDTO> GetPost(int postID)
         {
             //check if user is available??
@@ -74,5 +91,6 @@ namespace ProjekatNaVezbama.Services
 
             return _mapper.Map<PostOutDTO>(tempPost);
         }
+
     }
 }

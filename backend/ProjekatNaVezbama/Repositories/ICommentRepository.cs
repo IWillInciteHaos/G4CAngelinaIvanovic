@@ -9,6 +9,7 @@ namespace ProjekatNaVezbama.Repositories
         public Task<bool> CheckIfUserExists(string username);
         public Task<bool> CheckIfPostExists(int postID);
         public Task<IEnumerable<Comment>> GetAllComments();
+        public Task<List<Comment>> GetPostComments(Post p);
         public Task<Comment> GetComment(int commentID);
         public Task DeleteComment(Comment comment);
         public Task DeleteMultipleComments(List<Comment> comments);

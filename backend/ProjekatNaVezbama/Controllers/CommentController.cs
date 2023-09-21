@@ -16,8 +16,8 @@ namespace ProjekatNaVezbama.Controllers
         {
             _commentService = commentService;
         }
-
-        [HttpPost]
+        
+        [HttpPost("new_comments")]
         public async Task<ActionResult<CommentOutDTO>> CreateComment(CommentCreateDTO commentDTO)
         {
             var retVal = await _commentService.CreateComment(commentDTO);
@@ -27,8 +27,8 @@ namespace ProjekatNaVezbama.Controllers
                 {
                     return NotFound("No such user.");
                 }
-
-                if(retVal.PostID != null || retVal.PostID == -1)
+                //  don't remember why 
+                if(retVal.PostID == null || retVal.PostID == -1)
                 {
                     return NotFound("Post doesn't exist");
                 }
@@ -38,9 +38,9 @@ namespace ProjekatNaVezbama.Controllers
 
             return BadRequest();
         }
-
+        
         // GET: api/<UsersController>s
-        [HttpGet]
+        [HttpGet("get_comments")]
         //am I allowed to rename Get into GetAllPosts or something?
         public async Task<ActionResult<IEnumerable<CommentOutDTO>>> GetAllComments()
         {
@@ -49,7 +49,7 @@ namespace ProjekatNaVezbama.Controllers
         }
 
         // GET: api/<UsersController>
-        [HttpGet("{id}")]
+        [HttpGet("get_one_comment")]
         public async Task<ActionResult<CommentOutDTO>> GetOnePost(int id)
         {
             var retVal = await _commentService.GetComment(id);
@@ -57,9 +57,19 @@ namespace ProjekatNaVezbama.Controllers
             //but add user deleted and post deleted first
             return retVal is null ? NotFound() : Ok(retVal);
         }
-        
+
+
+        [HttpGet("get_post_comment")]
+        public async Task<ActionResult<List<PostOutDTO>>> GetOnePostComment([FromQuery] int postID)
+        {
+            var retVal = await _commentService.GetPostComments(postID);
+
+            //work on this
+            return retVal is null ? NotFound() : /*(retVal.ID == -1 ? NotFound("Post deleted.") :*/ Ok(retVal);
+        }
+
         //Delete
-        [HttpDelete]
+        [HttpDelete("deactivate_comment")]
         public async Task<ActionResult> DeleteComment(int commentID)
         {
             var retVal = await _commentService.DeleteComment(commentID);
